@@ -6,25 +6,11 @@ repositories {
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
-    maven {
-	url "http://mvn.riptano.com/content/repositories/public"
-    }
-    maven {
-	url "https://github.com/s7/mvnrepo/raw/master"
-    }
 }
 
 dependencies {
       compile group: 'com.google.guava', name: 'guava', version: '17.0'
-
-//    compile group: 'commons-daemon', name: 'commons-daemon', version: '1.0.15'
-    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.3'
-//    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.2.3'
-//    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '3.2.3'
-//    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.2.3'
-//    compile group: 'com.google.code.gson', name: 'gson', version: '2.2.4'
-
-//    compile group: 'com.eaio.uuid', name: 'uuid', version: '3.2'
+      compile group: 'org.apache.commons', name: 'commons-math3', version: '3.3'
 }
 
 task copyToLib(type: Copy) {
