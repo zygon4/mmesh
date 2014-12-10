@@ -155,16 +155,16 @@ public class Cell extends AbstractScheduledService {
     }
     
     private void sendPredictionFeedback() {
-        for (Map.Entry<Identifier, Double> totalById : this.predictionTable.getTotalValuesByIdentifiers().entrySet()) {
-            double value = Math.min(totalById.getValue(), 100.0);
+        for (Map.Entry<Identifier, Double> totalBySourceId : this.predictionTable.getTotalValuesByIdentifiers().entrySet()) {
+            double value = Math.min(totalBySourceId.getValue(), 100.0);
 
             value = Math.log(value);
             // This is up in the air: we're using the total activation value
             // from one particular source.  If they did predict us.
 
             if (value > 0) {
-                System.out.println(totalById.getKey() + " successfully predicted " + this.id + " by " + value);
-                Message outgoingMessages = new Message(Message.Type.PREDICTION, this.id, totalById.getKey(), value, new Date().getTime());
+                System.out.println(totalBySourceId.getKey() + " => " + this.id + " | " + value);
+                Message outgoingMessages = new Message(Message.Type.PREDICTION, this.id, totalBySourceId.getKey(), value, new Date().getTime());
                 this.router.send(this.id, outgoingMessages);
             }
         }
