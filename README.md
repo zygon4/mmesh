@@ -1,7 +1,7 @@
 Theoretical AGI memory system as a mesh network.
 =====
 
-It's a twist on the HTM CLA.  The hope is that it's more scalable and simpler.  It's really just a fun thought exercise for now.
+It's a twist on the HTM CLA.  It's sort of an ant swarm intelligence concept.  The hope is that it's more scalable and simpler.  It's really just a fun thought exercise for now.
 
 The basic idea: 
 
