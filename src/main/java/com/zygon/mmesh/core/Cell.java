@@ -1,6 +1,8 @@
 
 package com.zygon.mmesh.core;
 
+import com.google.common.base.Preconditions;
+import com.google.common.util.concurrent.AbstractScheduledService;
 import com.zygon.mmesh.Identifier;
 import com.zygon.mmesh.message.Message;
 import java.util.Collection;
@@ -9,29 +11,10 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
- * TODO:
  * 
- * Tables: (IN PROGRESS)
- *  - activations
- *  - predictions
- * 
- * Messaging: 
- *  - Activation message 
- *  - Prediction message
- *  - Routing algorithm (IN PROGRESS)
- * 
- * I/O:
- *  - Input queue
- *  - Output queue
- * 
- * "Metabolism":
- *  - Mechanism to cull the tables
- * 
- *
  * @author zygon
  */
-// TODO: move this down parallel to the message package
-public class Cell extends Thread {
+public class Cell extends AbstractScheduledService {
     
     private static final boolean VERBOSE = false;
     
@@ -40,13 +23,15 @@ public class Cell extends Thread {
     private final MessageQueue inputQueue = new MessageQueue();
 
     private final Identifier id;
+    private final Scheduler scheduler;
     private final Router router;
-    private volatile boolean running = true;
     
-    public Cell(Identifier id) {
-        super(id.getDisplay());
-        this.setDaemon(true);
+    public Cell(Identifier id, Scheduler scheduler) {
+        super();
+        Preconditions.checkArgument(id != null);
+        Preconditions.checkArgument(scheduler != null);
         this.id = id;
+        this.scheduler = scheduler;
         this.router = new Router(this.id);
     }
 
@@ -78,8 +63,8 @@ public class Cell extends Thread {
     }
     
     @Override
-    public void run() {
-        while (this.running) {
+    protected void runOneIteration() throws Exception {
+        while (this.inputQueue.hasMessage()) {
             try {
                 Message incomingMessage = this.inputQueue.get();
 
@@ -152,16 +137,21 @@ public class Cell extends Thread {
                             break;
                     }
                 } else {
-                    if (this.running) {
+                    if (this.isRunning()) {
                         System.out.println("BAD - should have blocked on receive");
                     }
                 }
             } catch (ExecutionException ee) {
-                if (this.running) {
+                if (this.isRunning()) {
                     ee.printStackTrace();
                 }
             }
         }
+    }
+    
+    @Override
+    protected Scheduler scheduler() {
+        return this.scheduler;
     }
     
     private void sendPredictionFeedback() {
@@ -184,12 +174,6 @@ public class Cell extends Thread {
         this.router.setDestinations(neighbors);
     }
     
-    public void doStop() {
-        this.running = false;
-        this.interrupt(); // this is ghetto - maybe send finalizing message
-        // also, not draining the remaining queue - this is a hard stop
-    }
-
     @Override
     public String toString() {
         return "{" + this.id + ": A_" + this.activationTable + "|P_" + this.predictionTable + "}";

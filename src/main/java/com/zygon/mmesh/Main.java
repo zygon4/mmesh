@@ -1,10 +1,12 @@
 package com.zygon.mmesh;
 
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.AbstractScheduledService.Scheduler;
 import com.zygon.mmesh.core.Cell;
 import com.zygon.mmesh.message.Message;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 
 public class Main {
@@ -57,11 +59,13 @@ public class Main {
     
     public static void main(String[] args) throws IOException {
         
+        Scheduler scheduler = Scheduler.newFixedRateSchedule(0, 5, TimeUnit.SECONDS);
+        
         Cell[] cells = new Cell[CELL_COUNT];
         
         // Create cells
         for (int i = 0; i < CELL_COUNT; i++) {
-            cells[i] = new Cell(new Identifier(i));
+            cells[i] = new Cell(new Identifier(i), scheduler);
         }
         
         // Attach neighbors
@@ -72,7 +76,7 @@ public class Main {
         
         // Start cells
         for (Cell cell : cells) {
-            cell.start();
+            cell.startAsync();
         }
         
         // Start simple watcher
@@ -80,7 +84,7 @@ public class Main {
         
         // Send an activation
         
-        for (int i = 1; i <= 50; i++) {
+        for (int i = 1; i <= 10; i++) {
             
             Identifier source1 = new Identifier(0);
             Identifier target1 = new Identifier(4);
@@ -106,7 +110,7 @@ public class Main {
         
         // Stop cells
         for (Cell cell : cells) {
-            cell.doStop();
+            cell.stopAsync();
         }
     }
 }

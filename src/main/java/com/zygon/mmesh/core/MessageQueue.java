@@ -31,4 +31,8 @@ public class MessageQueue {
         
         return null;
     }
+    
+    public boolean hasMessage() {
+        return !this.queue.isEmpty();
+    }
 }
