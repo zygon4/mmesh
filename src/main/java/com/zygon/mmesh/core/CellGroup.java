@@ -19,9 +19,9 @@ public class CellGroup {
     
     private static final class Watcher extends Thread {
 
-        private final Cell[] cells;
+        private final Collection<Cell>cells;
         
-        public Watcher(Cell[] cells) {
+        public Watcher(Collection<Cell>cells) {
             super("Watcher");
             super.setDaemon(true);
             
@@ -37,7 +37,7 @@ public class CellGroup {
                 StringBuilder sb = new StringBuilder();
                 
                 for (Cell cell : this.cells) {
-                    sb.append(cell);
+                    sb.append(cell.getPrinter().print());
                     sb.append(" ");
                 }
                 
@@ -101,8 +101,8 @@ public class CellGroup {
             cell.startAsync();
         }
         
-//      Start simple watcher
-//        new Watcher(cells).start();
+        // Start simple watcher
+        new Watcher(this.cellsById.values()).start();
     }
     
     public void doStop() {

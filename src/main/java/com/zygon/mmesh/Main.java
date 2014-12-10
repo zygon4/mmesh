@@ -1,6 +1,5 @@
 package com.zygon.mmesh;
 
-import com.zygon.mmesh.core.Cell;
 import com.zygon.mmesh.core.CellGroup;
 import com.zygon.mmesh.message.Message;
 import java.io.IOException;
@@ -16,7 +15,7 @@ public class Main {
         
         cellGroup.doStart();
         
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= 3; i++) {
             
             int prevSourceId = -1;
             int sourceId = -1;

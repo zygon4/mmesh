@@ -16,6 +16,33 @@ import java.util.concurrent.ExecutionException;
  */
 public class Cell extends AbstractScheduledService {
     
+    public static class CellPrinter {
+    
+        private final Cell cell;
+
+        public CellPrinter(Cell cell) {
+            this.cell = cell;
+        }
+        
+        private String format(Table table) {
+            StringBuilder sb = new StringBuilder();
+
+            double total = 0.0;
+            for (Map.Entry<Identifier, Double> totalBySourceId : table.getTotalValuesByIdentifiers().entrySet()) {
+                total += totalBySourceId.getValue();
+            }
+            total = Math.min(total, 100.0);
+
+            sb.append(String.format("%5.2f", total));
+            
+            return sb.toString();
+        }
+        
+        public String print() {
+            return "["+this.cell.id + ":" + format(this.cell.activationTable) + " | " + format(this.cell.predictionTable) +"]";
+        }
+    }
+    
     private static final boolean VERBOSE = false;
     
     private final Table activationTable = new Table("Activations");
@@ -30,6 +57,7 @@ public class Cell extends AbstractScheduledService {
         super();
         Preconditions.checkArgument(id != null);
         Preconditions.checkArgument(scheduler != null);
+        
         this.id = id;
         this.scheduler = scheduler;
         this.router = new Router(this.id);
@@ -39,6 +67,10 @@ public class Cell extends AbstractScheduledService {
     // cells should receive some form of activation.
     private static final double RESIDUAL_DROP_OFF = .5;
     private static final double RESIDUAL_CUTOFF = 10;
+
+    public CellPrinter getPrinter() {
+        return new CellPrinter(this); // just a new one for now
+    }
     
     public Identifier getIdentifier() {
         return this.id;
