@@ -31,10 +31,11 @@ public class Router {
         // different routing rules for the types of message
         switch (message.getType()) {
             case ACTIVATION:
+		// TBD: this is probably not hit anymore
                 for (Map.Entry<Identifier, MessageQueue> dest : this.destinations.entrySet()) {
                     // don't send back to the original location
                     if (!dest.getKey().equals(originalSource)) {
-                        Message msg = new Message(message.getType(), originalSource, dest.getKey(), message.getValue(), message.getTimestamp());
+			Message msg = message.setDestination(dest.getKey());
                         dest.getValue().put(msg);
                     }
                 }
@@ -80,6 +81,15 @@ public class Router {
                 
                 selectedQueue.put(message);
                 break;
+	    case RESIDUAL:
+		for (Map.Entry<Identifier, MessageQueue> dest : this.destinations.entrySet()) {
+		    // don't send back to the original location
+		    if (!dest.getKey().equals(originalSource)) {
+			Message msg = message.setDestination(dest.getKey());
+			dest.getValue().put(msg);
+		    }
+		}
+		break;
         }
     }
     

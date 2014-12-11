@@ -62,6 +62,14 @@ public class Message {
         return value;
     }
 
+    public Message setDestination(Identifier dest) {
+	return new Message(this.type, this.source, dest, this.value, this.timestamp);
+    }
+
+    public Message setSource(Identifier source) {
+	return new Message(this.type, source, this.destination, this.value, this.timestamp);
+    }
+
     @Override
     public String toString() {
         return this.display;
