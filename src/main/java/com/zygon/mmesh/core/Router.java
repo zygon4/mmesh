@@ -30,17 +30,6 @@ public class Router {
         
         // different routing rules for the types of message
         switch (message.getType()) {
-            case ACTIVATION:
-		// TBD: this is probably not hit anymore
-                for (Map.Entry<Identifier, MessageQueue> dest : this.destinations.entrySet()) {
-                    // don't send back to the original location
-                    if (!dest.getKey().equals(originalSource)) {
-			Message msg = message.setDestination(dest.getKey());
-                        dest.getValue().put(msg);
-                    }
-                }
-                break;
-
             case PREDICTION:
                 // Put the message in the correct outgoing queue. don't
                 // change the source/dest information.
@@ -90,6 +79,9 @@ public class Router {
 		    }
 		}
 		break;
+                
+            default:
+                throw new UnsupportedOperationException("Should not be routing: " + message.getType().name());
         }
     }
     
