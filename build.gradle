@@ -1,5 +1,8 @@
 
+apply plugin: 'application'
 apply plugin: 'java'
+
+mainClassName = "com.zygon.mmesh.Main"
 
 repositories {
     mavenCentral()
