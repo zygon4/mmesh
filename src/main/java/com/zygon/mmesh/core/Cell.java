@@ -2,16 +2,20 @@
 package com.zygon.mmesh.core;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import com.zygon.mmesh.Identifier;
 import com.zygon.mmesh.message.Message;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
- * 
+ * TBD: consider a watcher thread to check on active duty cycles
+ *      and "boost" mechanics.
+ *
  * @author zygon
  */
 public class Cell extends AbstractScheduledService {
@@ -187,6 +191,50 @@ public class Cell extends AbstractScheduledService {
     }
     
     private void sendPredictionFeedback() {
+
+	// TBD: Consider that we are giving feedback to specific
+	//      sources individually for there effort in predicting
+	//      us.  However, what we may want instead is to make
+	//      sure several sources predicted us (above a threshold,
+	//      etc.) and then call it a prediction.  I'd like to
+	//      avoid having a narrow prediction mechanism.  One 
+	//      activation to another activation is too narrow, we
+	//      want is one SDR to another SDR.
+
+
+	Map<Identifier,Double> predictionsById = Maps.newHashMap(this.predictionTable.getTotalValuesByIdentifiers());
+
+	Iterator<Identifier> iter = predictionsById.keySet().iterator();
+	while (iter.hasNext()) {
+	    Identifier id = iter.next();
+	    
+	    double value = Math.min(predictionsById.get(id), 100.0);
+
+            // TBD: prediction threshold
+	    if (value <= 0) {
+                iter.remove();
+	    }
+	}
+
+
+	// TBD: sending prediction feedback the the source as well as a list of
+	//      co-predictive cells.  This would help those active cells project
+	//      predictions into the future.
+
+	if (predictionsById.size() >= 1) { // TBD: predictionDuty constant
+	    for (Map.Entry<Identifier, Double> totalBySourceId : predictionsById.entrySet()) {
+
+                double value = totalBySourceId.getValue();
+                value = Math.log(value);
+
+		// TODO: better print statement with "all of the sources" => this.id
+                System.out.println(totalBySourceId.getKey() + " => " + this.id + " | " + value);
+                Message outgoingMessages = new Message(Message.Type.PREDICTION, this.id, totalBySourceId.getKey(), value, new Date().getTime());
+                this.router.send(this.id, outgoingMessages);
+	    }
+	}
+
+	/*
         for (Map.Entry<Identifier, Double> totalBySourceId : this.predictionTable.getTotalValuesByIdentifiers().entrySet()) {
             double value = Math.min(totalBySourceId.getValue(), 100.0);
 
@@ -200,6 +248,7 @@ public class Cell extends AbstractScheduledService {
                 this.router.send(this.id, outgoingMessages);
             }
         }
+	*/
     }
 
     public void setNeighbors(Collection<Cell> neighbors) {
