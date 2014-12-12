@@ -62,7 +62,7 @@ public class Table {
     
     private static long getCacheTimeout (long idxValue) {
         // seed fibonaci at 5 to get some larger values
-        return (fib (5 + idxValue));
+        return (fib (10 + idxValue)); // trying out some large value for a while
     }
     
     private static long getCacheIndex(double messageValue) {
@@ -139,6 +139,7 @@ public class Table {
             if (VERBOSE) {
                 System.out.println("filtering out msg");
             }
+            throw new IllegalStateException("Not expected anymore");
         }
         
         return putMessage;

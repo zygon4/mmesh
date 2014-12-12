@@ -62,6 +62,20 @@ public class CellGroup {
         return neighbors;
     }
     
+    // Testing out using all cells as neighbors - this means direct routing
+    // and really no residual activations
+    private static Collection<Cell> getAllOthers(int idx, Cell[] cells) {
+        Collection<Cell> neighbors = Lists.newArrayList();
+        
+        for (int i = 0; i < cells.length; i++) {
+            if (i != idx) {
+                neighbors.add(cells[i]);
+            }
+        }
+        
+        return neighbors;
+    }
+    
     private static final AbstractScheduledService.Scheduler CELL_SCHEDULER = 
             AbstractScheduledService.Scheduler.newFixedRateSchedule(0, 1, TimeUnit.SECONDS);
     
@@ -85,7 +99,8 @@ public class CellGroup {
         
         // Attach neighbors
         for (int i = 0; i < cellCount; i++) {
-            Collection<Cell> neighbors = getNeighbors(i, cells, 4);
+//            Collection<Cell> neighbors = getNeighbors(i, cells, 4);
+            Collection<Cell> neighbors = getAllOthers(i, cells);
             cells[i].setNeighbors(neighbors);
         }
         

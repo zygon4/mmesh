@@ -15,7 +15,7 @@ public class Main {
         
         cellGroup.doStart();
         
-        for (int i = 1; i <= 3; i++) {
+        for (int i = 1; i <= 10; i++) {
             
             int prevSourceId = -1;
             int sourceId = -1;
@@ -38,7 +38,9 @@ public class Main {
                 
                 cellGroup.send(new Message(Message.Type.ACTIVATION, source, target, i * 10, System.currentTimeMillis()));
                 
-                try { Thread.sleep(1000); } catch (Throwable ignore) {}
+                if ((i % 2) == 0) {
+                    try { Thread.sleep(1000); } catch (Throwable ignore) {}
+                }
             }
             
             try { Thread.sleep(1000); } catch (Throwable ignore) {}

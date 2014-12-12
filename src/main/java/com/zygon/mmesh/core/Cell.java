@@ -67,6 +67,12 @@ public class Cell extends AbstractScheduledService {
         this.router = new Router(this.id);
     }
 
+    /**
+     * How many predictors must be active to send positive feedback.  This 
+     * may want to become dynamic depending on the numbers of cells, etc.
+     */
+    private static final int PREDICTION_DUTY_MIN = 1;
+    
     // TBD: drop off should be proportional to the number of cells. Ideally, all
     // cells should receive some form of activation.
     private static final double RESIDUAL_DROP_OFF = .5;
@@ -90,6 +96,7 @@ public class Cell extends AbstractScheduledService {
         return incomingActivation.getValue() >= RESIDUAL_CUTOFF;
     }
     
+    @Deprecated
     private void propagateResidualActivation(Message msg) {
         if (this.requiresActivationPropagation(msg)) {
             double outgoingMessageValue = msg.getValue() * RESIDUAL_DROP_OFF;
@@ -132,7 +139,7 @@ public class Cell extends AbstractScheduledService {
                                 }
                                 
                                 // Propagate activation
-                                this.propagateResidualActivation(incomingMessage);
+//                                this.propagateResidualActivation(incomingMessage);
 
                                 // Send prediction feedback
                                 this.sendPredictionFeedback();
@@ -165,7 +172,7 @@ public class Cell extends AbstractScheduledService {
                                 }
                                 
                                 // Propagate activation
-                                this.propagateResidualActivation(incomingMessage);
+//                                this.propagateResidualActivation(incomingMessage);
 
                                 // Send prediction feedback
                                 this.sendPredictionFeedback();
@@ -216,41 +223,35 @@ public class Cell extends AbstractScheduledService {
 	    }
 	}
 
-
 	// TBD: sending prediction feedback the the source as well as a list of
 	//      co-predictive cells.  This would help those active cells project
 	//      predictions into the future.
 
-	if (predictionsById.size() >= 1) { // TBD: predictionDuty constant
+	if (predictionsById.size() >= PREDICTION_DUTY_MIN) {
+            
+            StringBuilder sb = new StringBuilder();
+            
 	    for (Map.Entry<Identifier, Double> totalBySourceId : predictionsById.entrySet()) {
 
                 double value = totalBySourceId.getValue();
                 value = Math.log(value);
 
-		// TODO: better print statement with "all of the sources" => this.id
-                System.out.println(totalBySourceId.getKey() + " => " + this.id + " | " + value);
-                Message outgoingMessages = new Message(Message.Type.PREDICTION, this.id, totalBySourceId.getKey(), value, new Date().getTime());
+                sb.append(totalBySourceId.getKey());
+                sb.append("|");
+                
+		Message outgoingMessages = new Message(Message.Type.PREDICTION, this.id, totalBySourceId.getKey(), value, new Date().getTime());
                 this.router.send(this.id, outgoingMessages);
 	    }
+            
+            // Just dump the predictions to stdout for now
+            System.out.println(sb.toString() + " => " + this.id);
 	}
-
-	/*
-        for (Map.Entry<Identifier, Double> totalBySourceId : this.predictionTable.getTotalValuesByIdentifiers().entrySet()) {
-            double value = Math.min(totalBySourceId.getValue(), 100.0);
-
-            value = Math.log(value);
-            // This is up in the air: we're using the total activation value
-            // from one particular source.  If they did predict us.
-
-            if (value > 0) {
-                System.out.println(totalBySourceId.getKey() + " => " + this.id + " | " + value);
-                Message outgoingMessages = new Message(Message.Type.PREDICTION, this.id, totalBySourceId.getKey(), value, new Date().getTime());
-                this.router.send(this.id, outgoingMessages);
-            }
-        }
-	*/
     }
 
+    // for negative feedback,
+    // if someone in our prediction table is active and we don't go active
+    // then reduce prediction.
+    
     public void setNeighbors(Collection<Cell> neighbors) {
         this.router.setDestinations(neighbors);
     }
