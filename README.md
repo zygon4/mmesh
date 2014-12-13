@@ -1,4 +1,4 @@
-Theoretical AGI memory system as a mesh network.
+Theoretical AGI memory system as a mesh network. (sort of - we're still in flux)
 =====
 
 It's a twist on the HTM CLA.  It's sort of an ant swarm intelligence concept.  The hope is that it's more scalable and simpler.  It's really just a fun thought exercise for now.
@@ -7,7 +7,6 @@ The basic idea:
 
 * You have a network of cells
 * Each cell listens for activations from remote cells
-* If a cell becomes active (from an outside source) it propagates a residual activation to other cells
 * If that same active cell was predicted to be active by a different cell, then it sends a prediction feedback message and that prediction becomes stronger
 * Right now, the activations and predictions are time-expiring (for better or worse - this is still in flux)
 
