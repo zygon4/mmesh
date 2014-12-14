@@ -96,15 +96,6 @@ public class Cell extends AbstractScheduledService {
         return incomingActivation.getValue() >= RESIDUAL_CUTOFF;
     }
     
-    @Deprecated
-    private void propagateResidualActivation(Message msg) {
-        if (this.requiresActivationPropagation(msg)) {
-            double outgoingMessageValue = msg.getValue() * RESIDUAL_DROP_OFF;
-            Message outgoingMessages = new Message(Message.Type.RESIDUAL, this.id, null, outgoingMessageValue, new Date().getTime());
-            this.router.send(msg.getSource(), outgoingMessages);
-        }
-    }
-    
     @Override
     protected void runOneIteration() throws Exception {
         while (this.inputQueue.hasMessage()) {
@@ -160,22 +151,6 @@ public class Cell extends AbstractScheduledService {
                                 }
                                 // route someone else's prediction message
                                 this.router.send(incomingMessage.getSource(), incomingMessage);
-                            }
-                            break;
-                            
-                        case RESIDUAL:
-                            boolean addedResidualMsg = this.activationTable.add(incomingMessage);
-
-                            if (addedResidualMsg) {
-                                if (VERBOSE) {
-                                    System.out.println(this.id + " received message: " + incomingMessage);
-                                }
-                                
-                                // Propagate activation
-//                                this.propagateResidualActivation(incomingMessage);
-
-                                // Send prediction feedback
-                                this.sendPredictionFeedback();
                             }
                             break;
                     }

@@ -13,8 +13,6 @@ public class Message {
     public static enum Type {
         ACTIVATION,
         PREDICTION,
-        @Deprecated
-        RESIDUAL
     }
     
     private final Type type;

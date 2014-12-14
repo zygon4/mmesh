@@ -70,15 +70,6 @@ public class Router {
                 
                 selectedQueue.put(message);
                 break;
-	    case RESIDUAL:
-		for (Map.Entry<Identifier, MessageQueue> dest : this.destinations.entrySet()) {
-		    // don't send back to the original location
-		    if (!dest.getKey().equals(originalSource)) {
-			Message msg = message.setDestination(dest.getKey());
-			dest.getValue().put(msg);
-		    }
-		}
-		break;
                 
             default:
                 throw new UnsupportedOperationException("Should not be routing: " + message.getType().name());
