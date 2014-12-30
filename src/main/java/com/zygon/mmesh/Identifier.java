@@ -2,6 +2,7 @@
 package com.zygon.mmesh;
 
 import com.google.common.base.Preconditions;
+import java.util.Arrays;
 
 /**
  * This impl might change tremendously
@@ -54,7 +55,7 @@ public class Identifier implements Comparable<Identifier> {
     
     @Override
     public int compareTo(Identifier o) {
-        return o.hashCode() > this.hashCode() ? 1 : (o.hashCode() < this.hashCode() ? -1 : 0);
+        return o.hashCode() > this.hashCode() ? -1 : (o.hashCode() < this.hashCode() ? 1 : 0);
     }
     
     @Override
@@ -74,13 +75,7 @@ public class Identifier implements Comparable<Identifier> {
     public final int hashCode() {
         
         if (this.hash == -1) {
-            int hashValue = 5;
-            
-            for (int coord : this.coordinates) {
-                hashValue = 41 * hashValue + coord;
-            }
-            
-            this.hash = hashValue;
+            this.hash = Arrays.hashCode(this.coordinates);
         }
         
         return this.hash;
