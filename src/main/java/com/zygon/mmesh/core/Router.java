@@ -31,44 +31,7 @@ public class Router {
         // different routing rules for the types of message
         switch (message.getType()) {
             case PREDICTION:
-                // Put the message in the correct outgoing queue. don't
-                // change the source/dest information.
-                
-                // Activation messages go to all neighbors so it's easy to splash
-                // them around.  Prediction messages, however, need to be routed 
-                // properly to their destinations.
-                
-                Identifier selectedId = null;
-                double selectedDistance = Double.MAX_VALUE;
-                MessageQueue selectedQueue = null;
-                
-                for (Map.Entry<Identifier, MessageQueue> dest : this.destinations.entrySet()) {
-                    
-                    Identifier destId = dest.getKey();
-                    double distanceAway = destId.getDistance(message.getDestination());
-                    MessageQueue destQueue = dest.getValue();
-                    
-                    if (selectedId == null) {
-                        selectedId = destId;
-                        selectedDistance = distanceAway;
-                        selectedQueue = destQueue;
-                    } else {
-//                        System.out.printf("%s comparedTo %s = [%d]\n", destId, message.getDestination(), destId.compareTo(message.getDestination()));
-                        
-                        if (distanceAway < selectedDistance) {
-                            selectedId = destId;
-                            selectedDistance = distanceAway;
-                            selectedQueue = destQueue;
-                            
-                            if (distanceAway == 0.0) {
-                                // This should be the correct one - just break
-                                break;
-                            }
-                        }
-                    }
-                }
-                
-                selectedQueue.put(message);
+                this.destinations.get(message.getDestination()).put(message);
                 break;
                 
             default:

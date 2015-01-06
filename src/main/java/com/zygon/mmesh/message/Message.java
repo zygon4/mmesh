@@ -16,25 +16,19 @@ public class Message {
     }
     
     private final Type type;
-    private final Identifier source;
     private final Identifier destination;
     private final double value;
     private final long timestamp;
     
     private final String display;
 
-    public Message(Type type, Identifier source, Identifier destination, double value, long timestamp) {
+    public Message(Type type, Identifier destination, double value, long timestamp) {
         this.type = type;
         this.value = value;
-        this.source = source;
         this.destination = destination;
         this.timestamp = timestamp;
         
-        this.display = this.type.name() + "," + "[source:" + this.source + ", dest:" + this.destination + "]," + this.value + "," + new Date(this.timestamp);
-    }
-
-    public Message(Type type, double value, long timestamp) {
-        this(type, null, null, value, timestamp);
+        this.display = this.type.name() + "," + "[dest:" + this.destination + "]," + this.value + "," + new Date(this.timestamp);
     }
     
     public Identifier getDestination() {
@@ -43,10 +37,6 @@ public class Message {
 
     public String getDisplay() {
         return display;
-    }
-
-    public Identifier getSource() {
-        return source;
     }
 
     public long getTimestamp() {
@@ -62,11 +52,7 @@ public class Message {
     }
 
     public Message setDestination(Identifier dest) {
-	return new Message(this.type, this.source, dest, this.value, this.timestamp);
-    }
-
-    public Message setSource(Identifier source) {
-	return new Message(this.type, source, this.destination, this.value, this.timestamp);
+	return new Message(this.type, dest, this.value, this.timestamp);
     }
 
     @Override

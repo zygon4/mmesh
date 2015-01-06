@@ -4,11 +4,13 @@ package com.zygon.mmesh.core;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import com.zygon.mmesh.Identifier;
 import com.zygon.mmesh.message.Message;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * @author zygon
  */
 public class CellGroup {
-    
+
     private static final class Watcher extends Thread {
 
         private final Collection<Cell>cells;
@@ -38,7 +40,7 @@ public class CellGroup {
                 
                 for (Cell cell : this.cells) {
                     sb.append(cell.getPrinter().print());
-                    sb.append(" ");
+                    sb.append("\n");
                 }
                 
                 System.out.println(sb);
@@ -77,10 +79,13 @@ public class CellGroup {
     }
     
     private static final AbstractScheduledService.Scheduler CELL_SCHEDULER = 
-            AbstractScheduledService.Scheduler.newFixedRateSchedule(0, 1, TimeUnit.SECONDS);
+            AbstractScheduledService.Scheduler.newFixedDelaySchedule(0, 500, TimeUnit.MILLISECONDS);
     
     private final Identifier groupId;
     private final Map<Identifier,Cell> cellsById = Maps.newHashMap();
+    
+    // For monitoring active cells
+    private final Set<Identifier> activeCellIds = Sets.newHashSet();
     
     // Consider an Identifer generator for different cell configurations
     // Also, maybe just plain old cell configuration properties like radius
@@ -94,7 +99,7 @@ public class CellGroup {
         
         // Create cells - just 1D for now
         for (int i = 0; i < cellCount; i++) {
-            cells[i] = new Cell(new Identifier(i), CELL_SCHEDULER);
+            cells[i] = new Cell(this, new Identifier(i), CELL_SCHEDULER);
         }
         
         // Attach neighbors
@@ -127,10 +132,35 @@ public class CellGroup {
         }
     }
     
-    public void send(Message message) {
-        Preconditions.checkArgument(this.cellsById.containsKey(message.getDestination()), "Destination not found for: " + message.getDestination());
+    public Identifier[] getActiveCells() {
+        return this.activeCellIds.toArray(new Identifier[this.activeCellIds.size()]);
+    }
+    
+    public int getCellCount() {
+        return this.cellsById.size();
+    }
+    
+    /*pkg*/ void notifyActive(Identifier id) {
+        Preconditions.checkArgument(this.cellsById.containsKey(id));
+        Preconditions.checkState(!this.activeCellIds.contains(id));
         
-        this.cellsById.get(message.getDestination()).getInputQueue().put(message);
+        this.activeCellIds.add(id);
+    }
+    
+    public void reset() {
+        this.activeCellIds.clear();
+        
+        for (Cell cell : this.cellsById.values()) {
+            cell.reset();
+        }
+    }
+    
+    public void send(Message message) {
+        // Send the message to ALL cells - cells have to manage their own 
+        // universe in relation to other cells.
+        for (Cell cell : this.cellsById.values()) {
+            cell.getInputQueue().put(message);
+        }
     }
     
     public void send(Message ...messages) {
