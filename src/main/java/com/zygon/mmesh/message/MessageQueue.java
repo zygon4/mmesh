@@ -2,7 +2,6 @@
 package com.zygon.mmesh.message;
 
 import com.google.common.collect.Queues;
-import com.zygon.mmesh.message.Message;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**

@@ -1,12 +1,9 @@
 
 package com.zygon.mmesh.message;
 
-import com.zygon.mmesh.message.MessageQueue;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.zygon.mmesh.Identifier;
-import com.zygon.mmesh.message.Destination;
-import com.zygon.mmesh.message.Message;
 import java.util.Collection;
 import java.util.Map;
 
