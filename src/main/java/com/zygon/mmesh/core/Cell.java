@@ -1,11 +1,14 @@
 
 package com.zygon.mmesh.core;
 
+import com.zygon.mmesh.message.Router;
+import com.zygon.mmesh.message.MessageQueue;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import com.zygon.mmesh.Identifier;
 import com.zygon.mmesh.message.ActivationMessage;
+import com.zygon.mmesh.message.Destination;
 import com.zygon.mmesh.message.Message;
 import com.zygon.mmesh.message.PredictionMessage;
 import java.util.Collection;
@@ -18,7 +21,7 @@ import java.util.concurrent.ExecutionException;
  *
  * @author zygon
  */
-public class Cell extends AbstractScheduledService {
+public class Cell extends AbstractScheduledService implements Destination {
     
     public static class CellPrinter {
     
@@ -113,7 +116,7 @@ public class Cell extends AbstractScheduledService {
 
     // This should probably be package scoped. There should be an input controller
     // do-hickey in the core package.
-    public final MessageQueue getInputQueue() {
+    public final MessageQueue getQueue() {
         return this.inputQueue;
     }
     
@@ -353,7 +356,7 @@ public class Cell extends AbstractScheduledService {
     // if someone in our prediction table is active and we don't go active
     // then reduce prediction.
     
-    public void setNeighbors(Collection<Cell> neighbors) {
+    public void setNeighbors(Collection<Destination> neighbors) {
         this.router.setDestinations(neighbors);
     }
     

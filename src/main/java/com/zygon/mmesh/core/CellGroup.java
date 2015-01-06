@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import com.zygon.mmesh.Identifier;
+import com.zygon.mmesh.message.Destination;
 import com.zygon.mmesh.message.Message;
 import java.util.Collection;
 import java.util.Map;
@@ -49,8 +50,8 @@ public class CellGroup {
     }
     
     // 1D dimensional for now
-    private static Collection<Cell> getNeighbors(int idx, Cell[] cells, int radius) {
-        Collection<Cell> neighbors = Lists.newArrayList();
+    private static Collection<Destination> getNeighbors(int idx, Cell[] cells, int radius) {
+        Collection<Destination> neighbors = Lists.newArrayList();
         
         int min = Math.max(idx - (radius / 2), 0);
         int max = Math.min(idx + (radius / 2), cells.length);
@@ -66,8 +67,8 @@ public class CellGroup {
     
     // Testing out using all cells as neighbors - this means direct routing
     // and really no residual activations
-    private static Collection<Cell> getAllOthers(int idx, Cell[] cells) {
-        Collection<Cell> neighbors = Lists.newArrayList();
+    private static Collection<Destination> getAllOthers(int idx, Cell[] cells) {
+        Collection<Destination> neighbors = Lists.newArrayList();
         
         for (int i = 0; i < cells.length; i++) {
             if (i != idx) {
@@ -105,7 +106,7 @@ public class CellGroup {
         // Attach neighbors
         for (int i = 0; i < cellCount; i++) {
 //            Collection<Cell> neighbors = getNeighbors(i, cells, 4);
-            Collection<Cell> neighbors = getAllOthers(i, cells);
+            Collection<Destination> neighbors = getAllOthers(i, cells);
             cells[i].setNeighbors(neighbors);
         }
         
@@ -159,7 +160,7 @@ public class CellGroup {
         // Send the message to ALL cells - cells have to manage their own 
         // universe in relation to other cells.
         for (Cell cell : this.cellsById.values()) {
-            cell.getInputQueue().put(message);
+            cell.getQueue().put(message);
         }
     }
     

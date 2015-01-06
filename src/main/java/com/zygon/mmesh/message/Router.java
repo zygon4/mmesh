@@ -1,9 +1,11 @@
 
-package com.zygon.mmesh.core;
+package com.zygon.mmesh.message;
 
+import com.zygon.mmesh.message.MessageQueue;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.zygon.mmesh.Identifier;
+import com.zygon.mmesh.message.Destination;
 import com.zygon.mmesh.message.Message;
 import java.util.Collection;
 import java.util.Map;
@@ -39,13 +41,13 @@ public class Router {
         }
     }
     
-    /*pkg*/ final void setDestinations(Collection<Cell> destinations) {
+    public final void setDestinations(Collection<Destination> destinations) {
         Preconditions.checkArgument(destinations != null && !destinations.isEmpty());
         
         this.destinations.clear();
         
-        for (Cell cell : destinations) {
-            this.destinations.put(cell.getIdentifier(), cell.getInputQueue());
+        for (Destination dest : destinations) {
+            this.destinations.put(dest.getIdentifier(), dest.getQueue());
         }
     }
 }
